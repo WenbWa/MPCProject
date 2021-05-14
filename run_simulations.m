@@ -93,24 +93,24 @@ disp('From LQR to MPC started');
 % 
 % clear controller_mpc_1;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_1, Q1, R1, scen1);
+% [~,~,Jmpc,~,~,~] = simulate_building(T01, @controller_mpc_1, Q1, R1, scen1)
 % clear controller_mpc_1;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T02, @controller_mpc_1, Q2, R2, scen1);
-
+% [~,~,Jmpc,~,~,~] = simulate_building(T02, @controller_mpc_1, Q2, R2, scen1)
+% 
 % clear controller_mpc_2;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_2, Q1, R1, scen1);
+% [~,~,Jmpc,~,~,~] = simulate_building(T01, @controller_mpc_2, Q1, R1, scen1)
 % clear controller_mpc_2;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T02, @controller_mpc_2, Q2, R2, scen1);
+% [~,~,Jmpc,~,~,~] = simulate_building(T02, @controller_mpc_2, Q2, R2, scen1)
 % 
 % clear controller_mpc_3;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_3, Q1, R1, scen1);
+% [~,~,Jmpc,~,~,~] = simulate_building(T01, @controller_mpc_3, Q1, R1, scen1)
 % clear controller_mpc_3;
 % figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T02, @controller_mpc_3, Q2, R2, scen1);
+% [~,~,Jmpc,~,~,~] = simulate_building(T02, @controller_mpc_3, Q2, R2, scen1)
 
 disp('From LQR to MPC finished');
 
@@ -177,13 +177,12 @@ disp('Offset-free MPC started');
 % figure; set(gcf, 'WindowStyle' ,'docked');
 % [T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_3, Q1, R1, scen3);
 % 
-% clear controller_mpc_6;
-% figure; set(gcf, 'WindowStyle' ,'docked');
-% [T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_6, Q1, R1, scen3);
+clear controller_mpc_6;
+figure; set(gcf, 'WindowStyle' ,'docked');
+[T,p,~,~,T_v,p_v] = simulate_building(T01, @controller_mpc_6, Q1, R1, scen3);
 % 
 % 
 % Dh = readmatrix('Dh.csv');
-% 
 % figure;
 % subplot(3,1,1)
 % plot(scen3.d_VC_scen+scen3.a_Env_VC * scen3.T_Env, '-o','Color','b')
@@ -200,20 +199,38 @@ disp('Offset-free MPC started');
 % hold on
 % plot(Dh(3, :), '-o','Color','r')
 % title('scen3.dF2'), xlabel('t'), ylabel('d');
+% 
+% Th = readmatrix('Th.csv');
+% figure;
+% subplot(3,1,1)
+% plot(T(1, :), '-o','Color','b')
+% hold on
+% plot(Th(1, :), '-o','Color','r')
+% title('T_VC'), xlabel('t'), ylabel('d');
+% subplot(3,1,2)
+% plot(T(2, :), '-o','Color','b')
+% hold on
+% plot(Th(2, :), '-o','Color','r')
+% title('T_F1'), xlabel('t'), ylabel('d');
+% subplot(3,1,3)
+% plot(T(3, :), '-o','Color','b')
+% hold on
+% plot(Th(3, :), '-o','Color','r')
+% title('T_F2'), xlabel('t'), ylabel('d');
 
 disp('Offset-free MPC finished');
 
 %% Comparison using forces
 disp('MPC Implementation with FORCES Pro started');
 
-clear controller_mpc_1;
-figure; set(gcf, 'WindowStyle' ,'docked');
-[T,p,~,t_sim,T_v,p_v] = simulate_building(T02, @controller_mpc_1, Q2, R2, scen1);
-
-clear controller_mpc_1_forces;
-figure; set(gcf, 'WindowStyle' ,'docked');
-controller_mpc_1_forces(Q2, R2, T02, 30);
-[T,p,~,t_sim_forces,T_v,p_v] = simulate_building(T02, @controller_mpc_1_forces, Q2, R2, scen1);
+% clear controller_mpc_1;
+% figure; set(gcf, 'WindowStyle' ,'docked');
+% [T,p,~,t_sim,T_v,p_v] = simulate_building(T02, @controller_mpc_1, Q2, R2, scen1);
+% 
+% clear controller_mpc_1_forces;
+% figure; set(gcf, 'WindowStyle' ,'docked');
+% controller_mpc_1_forces(Q2, R2, T02, 30);
+% [T,p,~,t_sim_forces,T_v,p_v] = simulate_building(T02, @controller_mpc_1_forces, Q2, R2, scen1);
 
 
 disp('MPC Implementation with FORCES Pro finished');

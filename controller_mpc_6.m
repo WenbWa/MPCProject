@@ -11,11 +11,11 @@
 
 function p = controller_mpc_6(Q,R,T,N,~)
 % controller variables
-persistent param yalmip_optimizer Th Dh Aaug Caug L Dh_csv
+persistent param yalmip_optimizer Th Dh Aaug Caug L Th_csv Dh_csv
 
 % Initialize param, MPC controller, Th, Dh, if not done already
 if isempty(param)
-    [param, yalmip_optimizer, Th, Dh, Aaug, Caug, L, Dh_csv] = init(Q,R,T,N);
+    [param, yalmip_optimizer, Th, Dh, Aaug, Caug, L, Th_csv, Dh_csv] = init(Q,R,T,N);
 end
 
 % evaluate control action by solving MPC problem
@@ -43,13 +43,15 @@ p = u_mpc{1} + u_mpc{2};
 aux = [Th; Dh];
 aux = Aaug*aux + [param.B; zeros(3)]*p + L*(-T + Caug*aux);
 Th = aux(1:3);
+Th_csv(:, size(Th_csv,2)+1) = Th;
+writematrix(Th_csv,'Th.csv');
 Dh = aux(4:6);
-Dh_csv(:, size(Dh_csv,2)+1) = Dh;
+Dh_csv(:, size(Dh_csv, 2)+1) = Dh;
 writematrix(Dh_csv,'Dh.csv');
 
 end
 
-function [param, yalmip_optimizer, Th, Dh, Aaug, Caug, L, Dh_csv, p_sp] = init(Q,R,T,N)
+function [param, yalmip_optimizer, Th, Dh, Aaug, Caug, L, Th_csv, Dh_csv] = init(Q,R,T,N)
 % get basic controller parameters
 % ...
 % get terminal cost
@@ -88,10 +90,12 @@ Caug = [eye(3), zeros(3)];
 % P = [0, 0, 0, 0.5, 0.5, 0.5];
 P = [0, 0, 0, 0.5, 0.5, 0.5];
 L = -(place(Aaug',Caug',P))';
+eig(Aaug + L*Caug)
 % Init state and disturbance estimate variables
 Th = T;
 Dh = zeros(3, 1);
 % Dh = [6000; -750; 400];
+Th_csv(:, 1) = Th;
 Dh_csv(:, 1) = Dh;
 
 % Implement your MPC using Yalmip here
@@ -100,7 +104,6 @@ nu = size(param.B,2);
 nd = size(param.Bd,2);
 U = sdpvar(repmat(nu,1,N-1),ones(1,N-1),'full');
 X = sdpvar(repmat(nx,1,N),ones(1,N),'full');
-error = sdpvar(repmat(2*nx,1,N),ones(1,N),'full');
 T0 = sdpvar(nx,1,'full');
 D0 = sdpvar(nd,1,'full');
 
